@@ -1,0 +1,12 @@
+.attribute{
+    border: 1px solid black;
+    margin: 5px;
+    padding: 5px;
+    float: left;
+    max-width: 250px;
+}
+
+.bar{
+    height: 10px;
+    background-color: red;
+}

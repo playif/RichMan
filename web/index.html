@@ -2,11 +2,34 @@
 <html>
 <head lang="en">
     <meta charset="UTF-8">
+    <link rel="stylesheet" href="index.css">
     <title>Rich Man</title>
 </head>
 <body ng-app rich-man>
 
-{{ctrl.money}}
+你現在有{{ctrl.money}}元！
+
+<hr/>
+<button ng-click="ctrl.work()">撿破爛</button>
+
+<!--<button nf-if="ctrl.canBuyDog" ng-click="ctrl.work()">撿破爛</button>-->
+
+<div ng-repeat="attr in ctrl.attributes">
+    <div ng-if="attr.canBuy()" class="attribute">
+        <h4>{{attr.name}}
+            <a href="#" ng-if="ctrl.canBuy(attr)" ng-click="ctrl.buy(attr)">[購買]</a>
+        </h4>
+
+        <div>費用：{{attr.cost()}}</div>
+        <div>數量：{{attr.count}}</div>
+        <div ng-if="attr.has()">單一收入：{{attr.singleIncome()}}/s</div>
+        <div ng-if="attr.has()">全體收入：{{attr.totalIncome()}}/s</div>
+        <div ng-if="attr.has()">累積收入：{{attr.totalEarn}}</div>
+        <div>說明：{{attr.desc}}</div>
+        <div ng-if="attr.has()" class="bar" ng-style="{width:attr.ratio}"></div>
+    </div>
+</div>
+
 
 <script type="application/dart" src="main.dart"></script>
 <script src="packages/browser/dart.js"></script>
