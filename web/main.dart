@@ -99,14 +99,14 @@ class RichMan {
       return 10 + totalCount;
     });
 
-    Work biss = setupWork("做生意", [], 5000,
+    Work biss = setupWork("做生意", [], 8000,
     income:() {
-      return 1000 + totalWork;
+      return (0.2 * totalWork).floor();
     });
 
     Work bigBiss = setupWork("做貿易", [], 200000,
     income:() {
-      return (20000 + totalWork * totalCount).floor();
+      return (0.05 * totalWork * totalCount).floor();
     });
 
     Attribute dog = new Attribute();
