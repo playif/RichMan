@@ -9,7 +9,7 @@
 .attribute .info {
     border: 1px solid black;
     float: left;
-    padding: 5px;
+    padding: 5px; 
     margin: 5px;
     min-width: 300px;
 }

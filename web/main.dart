@@ -141,14 +141,14 @@ class RichMan {
       return 120000 + pow(smallVandor.count * 100, 1.5);
     };
 
-    setupAttr(midBiss, 720000, 1.5, 160)
+    setupAttr(midBiss, 7200000, 1.5, 160)
       ..name = "中型店鋪"
       ..desc = ["比小店舖獲得更多收入", "每個小攤販和小店舖都會增加收入"]
       ..income = () {
       return 920000 + pow(smallBiss.count * 300, 1.5) + pow(smallVandor.count * 200, 1.5);
     };
 
-    setupAttr(LargeBiss, 5220000, 1.6, 320)
+    setupAttr(LargeBiss, 52200000, 1.6, 320)
       ..name = "大型店鋪"
       ..desc = ["比中型店舖獲得更多收入", "所有店舖都會增加收入"]
       ..income = () {
