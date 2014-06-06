@@ -21,6 +21,8 @@ class Attribute {
   List<Upgrade> upgrades = [];
   int count = 0;
   int cd = 0;
+  int totalEarn = 0;
+  int totalAction = 0;
   Func cost;
   Func income;
   Func delay;
@@ -40,7 +42,6 @@ class Attribute {
     return singleIncome() * count;
   }
 
-  int totalEarn = 0;
 
   String get ratio {
     num rate = 100 * cd / delay();
@@ -61,9 +62,22 @@ class Upgrade {
   If canBuy;
   If show;
   When buy;
-
-
 }
+
+class Work {
+  String name;
+  List<String> desc = [];
+
+  Func income;
+
+  If show;
+
+  When work;
+
+  int totalEarn = 0;
+  int totalAction = 0;
+}
+
 
 main() {
   applicationFactory()
@@ -80,7 +94,20 @@ class RichMan {
   Set<String> unlocks = new Set();
 
   RichMan() {
+    Work pick = setupWork("撿破爛", [], 0,
+    income:() {
+      return 10 + totalCount;
+    });
 
+    Work biss = setupWork("做生意", [], 5000,
+    income:() {
+      return 1000 + totalWork;
+    });
+
+    Work bigBiss = setupWork("做貿易", [], 200000,
+    income:() {
+      return (20000 + totalWork * totalCount).floor();
+    });
 
     Attribute dog = new Attribute();
     Attribute human = new Attribute();
@@ -240,12 +267,16 @@ class RichMan {
       up.canBuy = () {
         return money >= up.cost() && up.maxLevel > up.level;
       };
+    } else {
+      up.canBuy = canBuy;
     }
 
     if (show == null) {
       up.show = () {
         return totalEarn >= up.cost() && up.maxLevel > up.level;
       };
+    } else {
+      up.show = show;
     }
 
     if (buy == null) {
@@ -261,7 +292,46 @@ class RichMan {
     return up;
   }
 
+  Work setupWork(String name, List<String> desc, int baseShow, {income, show, work}) {
+    Work w = new Work();
+    w.name = name;
+    w.desc = desc;
+
+    if (income == null) {
+      w.income = () {
+
+      };
+    } else {
+      w.income = income;
+    }
+
+    if (show == null) {
+      w.show = () {
+        return totalEarn >= baseShow;
+      };
+    } else {
+      w.show = show;
+    }
+
+    if (work == null) {
+      w.work = () {
+        money += w.income();
+        totalEarn += w.income();
+        w.totalEarn += w.income();
+        totalWork += 1;
+        w.totalAction += 1;
+      };
+    } else {
+      w.work = work;
+    }
+
+    works.add(w);
+    return w;
+  }
+
   List<Attribute> attributes = [];
+
+  List<Work> works = [];
 
   _update(Timer timer) {
     for (var attr in attributes) {
@@ -272,8 +342,9 @@ class RichMan {
         var income = (attr.income() * attr.count);
         money += income;
         attr.totalEarn += income;
+        attr.totalAction += attr.count;
         totalEarn += income;
-        totalAction += 1;
+        totalAction += attr.count;
         attr.action();
       }
     }
@@ -288,13 +359,14 @@ class RichMan {
   int totalCount = 0;
   int totalAction = 0;
   int totalUpgrade = 0;
+  int totalWork = 0;
 
 //  bool canBuyDog = false;
 
-  void work() {
-    money += workIncome + totalCount;
-    totalEarn += workIncome;
-  }
+//  void work() {
+//    money += workIncome + totalCount;
+//    totalEarn += workIncome;
+//  }
 
 //  int dogCount = 0;
 //  int dogIncome = 0;
