@@ -1,0 +1,6 @@
+name: RichMan
+dependencies:
+  browser: any
+  angular: any
+transformers:
+  - angular
