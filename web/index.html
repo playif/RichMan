@@ -44,7 +44,7 @@
 
             <span ng-repeat="up in attr.upgrades"><span ng-if="up.level != 0">[{{up.name}}({{up.level}})] </span></span>
         </div>
-        <div ng-if="attr.has()"> 
+        <div ng-if="attr.has()">
             <div ng-repeat="up in attr.upgrades">
                 <div ng-if="up.show()" class="upgrade">
                     升級：{{up.name}}({{up.level+1}})
@@ -55,7 +55,7 @@
                         <li ng-repeat="desc in up.desc">{{desc}}</li>
                     </ul>
                 </div>
-            </div>
+            </div> 
         </div>
     </div>
 
