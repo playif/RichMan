@@ -32,14 +32,16 @@ class ContentPort {
 
   content(dom.Element elt) {
     var hash = elt.hashCode;
-    var beginComment = new dom.Comment("content $hash");
+    var beginComment = null;
 
     if (_childNodes.isNotEmpty) {
+      beginComment = new dom.Comment("content $hash");
       elt.parent.insertBefore(beginComment, elt);
       elt.parent.insertAllBefore(_childNodes, elt);
       elt.parent.insertBefore(new dom.Comment("end-content $hash"), elt);
       _childNodes = [];
     }
+
     elt.remove();
     return beginComment;
   }
@@ -48,11 +50,15 @@ class ContentPort {
     // Search for endComment and extract everything in between.
     // TODO optimize -- there may be a better way of pulling out nodes.
 
+    if (_beginComment == null) {
+      return;
+    }
+
     var endCommentText = "end-${_beginComment.text}";
 
     var next;
     for (next = _beginComment.nextNode;
-         next.nodeType != dom.Node.COMMENT_NODE && next.text != endCommentText;
+         next.nodeType != dom.Node.COMMENT_NODE || next.text != endCommentText;
          next = _beginComment.nextNode) {
       _childNodes.add(next);
       next.remove();

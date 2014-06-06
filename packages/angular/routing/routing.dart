@@ -8,18 +8,20 @@ class RouteViewFactory {
 
   RouteViewFactory(this.locationService);
 
-  call(String templateUrl) =>
+  Function call(String templateUrl) =>
       (RouteEnterEvent event) => _enterHandler(event, templateUrl);
 
-  _enterHandler(RouteEnterEvent event, String templateUrl,
-                {List<Module> modules, String templateHtml}) =>
-      locationService._route(event.route, templateUrl, fromEvent: true,
-          modules: modules, templateHtml: templateHtml);
+  void _enterHandler(RouteEnterEvent event, String templateUrl,
+                     {List<Module> modules, String templateHtml}) {
+    locationService._route(event.route, templateUrl, fromEvent: true,
+        modules: modules, templateHtml: templateHtml);
+  }
 
-  configure(Map<String, NgRouteCfg> config) =>
-      _configure(locationService.router.root, config);
+  void configure(Map<String, NgRouteCfg> config) {
+    _configure(locationService.router.root, config);
+  }
 
-  _configure(Route route, Map<String, NgRouteCfg> config) {
+  void _configure(Route route, Map<String, NgRouteCfg> config) {
     config.forEach((name, cfg) {
       var modulesCalled = false;
       List<Module> newModules;
@@ -53,6 +55,11 @@ class RouteViewFactory {
               cfg.preEnter(e);
             }
           },
+          preLeave: (RoutePreLeaveEvent e) {
+            if (cfg.preLeave != null) {
+              cfg.preLeave(e);
+            }
+          },
           leave: cfg.leave,
           mount: (Route mountRoute) {
             if (cfg.mount != null) {
@@ -66,10 +73,10 @@ class RouteViewFactory {
 NgRouteCfg ngRoute({String path, String view, String viewHtml,
     Map<String, NgRouteCfg> mount, modules(), bool defaultRoute: false,
     RoutePreEnterEventHandler preEnter, RouteEnterEventHandler enter,
-    RouteLeaveEventHandler leave}) =>
+    RoutePreLeaveEventHandler preLeave, RouteLeaveEventHandler leave}) =>
         new NgRouteCfg(path: path, view: view, viewHtml: viewHtml, mount: mount,
             modules: modules, defaultRoute: defaultRoute, preEnter: preEnter,
-            enter: enter, leave: leave);
+            preLeave: preLeave, enter: enter, leave: leave);
 
 class NgRouteCfg {
   final String path;
@@ -80,10 +87,11 @@ class NgRouteCfg {
   final bool defaultRoute;
   final RouteEnterEventHandler enter;
   final RoutePreEnterEventHandler preEnter;
+  final RoutePreLeaveEventHandler preLeave;
   final RouteLeaveEventHandler leave;
 
   NgRouteCfg({this.view, this.viewHtml, this.path, this.mount, this.modules,
-      this.defaultRoute, this.enter, this.preEnter, this.leave});
+      this.defaultRoute, this.enter, this.preEnter, this.preLeave, this.leave});
 }
 
 /**
@@ -115,8 +123,8 @@ typedef void RouteInitializerFn(Router router, RouteViewFactory viewFactory);
 class NgRoutingHelper {
   final Router router;
   final Application _ngApp;
-  List<NgView> portals = <NgView>[];
-  Map<String, _View> _templates = new Map<String, _View>();
+  final _portals = <NgView>[];
+  final _templates = <String, _View>{};
 
   NgRoutingHelper(RouteInitializer initializer, Injector injector, this.router,
                   this._ngApp) {
@@ -136,7 +144,7 @@ class NgRoutingHelper {
     router.onRouteStart.listen((RouteStartEvent routeEvent) {
       routeEvent.completed.then((success) {
         if (success) {
-          portals.forEach((NgView p) => p._maybeReloadViews());
+          _portals.forEach((NgView p) => p._maybeReloadViews());
         }
       });
     });
@@ -155,7 +163,7 @@ class NgRoutingHelper {
       if (viewDef == null) continue;
       var templateUrl = viewDef.template;
 
-      NgView view = portals.lastWhere((NgView v) {
+      NgView view = _portals.lastWhere((NgView v) {
         return _routePath(route) != _routePath(v._route) &&
             _routePath(route).startsWith(_routePath(v._route));
       }, orElse: () => null);
@@ -173,11 +181,11 @@ class NgRoutingHelper {
   }
 
   void _registerPortal(NgView ngView) {
-    portals.add(ngView);
+    _portals.add(ngView);
   }
 
   void _unregisterPortal(NgView ngView) {
-    portals.remove(ngView);
+    _portals.remove(ngView);
   }
 }
 
@@ -190,7 +198,7 @@ class _View {
 }
 
 String _routePath(Route route) {
-  var path = [];
+  final path = [];
   var p = route;
   while (p.parent != null) {
     path.insert(0, p.name);

@@ -1,50 +1,56 @@
 part of angular.formatter_internal;
 
 /**
- * Formats date to a string based on the requested format.
- * See Dart http://api.dartlang.org/docs/releases/latest/intl/DateFormat.html
- * for full formating options.
+ * Formats a date value to a string based on the requested format.
  *
- * - `medium`: equivalent to `MMM d, y h:mm:ss a` for en_US locale (e.g. Sep 3, 2010 12:05:08 pm)
- * - `short`: equivalent to `M/d/yy h:mm a` for en_US locale (e.g. 9/3/10 12:05 pm)
- * - `fullDate`: equivalent to `EEEE, MMMM d, y` for en_US locale (e.g. Friday, September 3, 2010)
- * - `longDate`: equivalent to `MMMM d, y` for en_US locale (e.g. September 3, 2010)
- * - `mediumDate`: equivalent to `MMM d, y` for en_US locale (e.g. Sep 3, 2010)
- * - `shortDate`: equivalent to `M/d/yy` for en_US locale (e.g. 9/3/10)
- * - `mediumTime`: equivalent to `h:mm:ss a` for en_US locale (e.g. 12:05:08 pm)
- * - `shortTime`: equivalent to `h:mm a` for en_US locale (e.g. 12:05 pm)
+ * # Usage
  *
+ *     date_expression | date[:format]
  *
- * Usage:
+ * `format` may be specified explicitly, or by using one of the following predefined shorthand:
  *
- *     {{ date_expression | date[:format] }}
+ *      FORMAT NAME        OUTPUT for en_US
+ *     -------------  ---------------------------
+ *      medium         Sep 3, 2010 12:05:08 PM
+ *      short          9/3/10 12:05 PM
+ *      fullDate       Friday, September 3, 2010
+ *      longDate       September 3, 2010
+ *      mediumDate     Sep 3, 2010
+ *      shortDate      9/3/10
+ *      mediumTime     12:05:08 PM
+ *      shortTime      12:05 PM
+ *
+ * For more on explicit formatting of dates and date syntax, see the documentation for the
+ * [DartFormat class](https://api.dartlang.org/apidocs/channels/stable/dartdoc-viewer/intl/intl.DateFormat).
+ *
+ * # Example
+ *
+ *     '2014-05-22' | date:'fullDate'     // "Thursday, May 22, 2014" for the en_US locale
  *
  */
 @Formatter(name:'date')
 class Date implements Function {
-  static final _MAP = const <String, String> {
-    'medium':     'MMM d, y h:mm:ss a',
-    'short':      'M/d/yy h:mm a',
-    'fullDate':   'EEEE, MMMM d, y',
-    'longDate':   'MMMM d, y',
-    'mediumDate': 'MMM d, y',
-    'shortDate':  'M/d/yy',
-    'mediumTime': 'h:mm:ss a',
-    'shortTime':  'h:mm a',
+  static final _PATTERNS = const <String, dynamic> {
+    'medium':     const [DateFormat.YEAR_ABBR_MONTH_DAY, DateFormat.HOUR_MINUTE_SECOND],
+    'short':      const [DateFormat.YEAR_NUM_MONTH_DAY, DateFormat.HOUR_MINUTE],
+    'fullDate':   DateFormat.YEAR_MONTH_WEEKDAY_DAY,
+    'longDate':   DateFormat.YEAR_MONTH_DAY,
+    'mediumDate': DateFormat.YEAR_ABBR_MONTH_DAY,
+    'shortDate':  DateFormat.YEAR_NUM_MONTH_DAY,
+    'mediumTime': DateFormat.HOUR_MINUTE_SECOND,
+    'shortTime':  DateFormat.HOUR_MINUTE,
   };
 
+  /// locale -> (format -> DateFormat)
   var _dfs = new Map<String, Map<String, DateFormat>>();
 
   /**
-   *  [date]: Date to format either as Date object, milliseconds
-   *    ([string] or [num]) or various ISO 8601 datetime string formats
-   *    (e.g. `yyyy-MM-ddTHH:mm:ss.SSSZ` and its shorter versions like
-   *    `yyyy-MM-ddTHH:mmZ`, `yyyy-MM-dd` or `yyyyMMddTHHmmssZ`). If no
-   *    timezone is specified in the string input, the time is considered to
-   *    be in the local timezone.
+   * Format a value as a date.
    *
-   *  [format]: Formatting rules (see Description). If not specified,
-   *    mediumDate is used
+   *  - `date`:   value to format as a date. If no timezone is specified in the string input,
+   *     the time is considered to be in the local timezone.
+   *  - `format`: Either a named format, or an explicit format specification.  If no format is
+   *     specified, mediumDate is used.
    *
    */
   dynamic call(Object date, [String format = 'mediumDate']) {
@@ -52,14 +58,26 @@ class Date implements Function {
     if (date is String) date = DateTime.parse(date);
     if (date is num) date = new DateTime.fromMillisecondsSinceEpoch(date);
     if (date is! DateTime) return date;
-    if (_MAP.containsKey(format)) format = _MAP[format];
     var verifiedLocale = Intl.verifiedLocale(Intl.getCurrentLocale(), DateFormat.localeExists);
-    _dfs.putIfAbsent(verifiedLocale, () => new Map<String, DateFormat>());
-    var df = _dfs[verifiedLocale][format];
-    if (df == null) {
-      df = new DateFormat(format);
-      _dfs[verifiedLocale][format] = df;
+    return _getDateFormat(verifiedLocale, format).format(date);
+  }
+
+  DateFormat _getDateFormat(String locale, String format) {
+    _dfs.putIfAbsent(locale, () => <String, DateFormat>{});
+
+    if (_dfs[locale][format] == null) {
+      var pattern = _PATTERNS.containsKey(format) ? _PATTERNS[format] : format;
+      if (pattern is !Iterable) pattern = [pattern];
+      var df = new DateFormat();
+      pattern.forEach((p) {
+         df.addPattern(p);
+      });
+      if (format == "short" || format == "shortDate") {
+        // "short" and "shortDate" formats use a 2-digit year
+        df = new DateFormat(df.pattern.replaceAll(new RegExp('y+'), 'yy'));
+      }
+      _dfs[locale][format] = df;
     }
-    return df.format(date);
+    return _dfs[locale][format];
   }
 }

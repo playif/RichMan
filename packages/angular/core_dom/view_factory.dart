@@ -15,8 +15,10 @@ class BoundViewFactory {
 
   BoundViewFactory(this.viewFactory, this.injector);
 
+  static Key _SCOPE_KEY = new Key(Scope);
+
   View call(Scope scope) =>
-      viewFactory(injector.createChild([new Module()..bind(Scope, toValue: scope)]));
+      viewFactory(injector.createChild([new Module()..bindByKey(_SCOPE_KEY, toValue: scope)]));
 }
 
 abstract class ViewFactory implements Function {
@@ -118,7 +120,7 @@ class WalkingViewFactory implements ViewFactory {
 @Injectable()
 class ViewCache {
   // _viewFactoryCache is unbounded
-  final _viewFactoryCache = new LruCache<String, ViewFactory>(capacity: 0);
+  final viewFactoryCache = new LruCache<String, ViewFactory>();
   final Http http;
   final TemplateCache templateCache;
   final Compiler compiler;
@@ -127,12 +129,12 @@ class ViewCache {
   ViewCache(this.http, this.templateCache, this.compiler, this.treeSanitizer);
 
   ViewFactory fromHtml(String html, DirectiveMap directives) {
-    ViewFactory viewFactory = _viewFactoryCache.get(html);
+    ViewFactory viewFactory = viewFactoryCache.get(html);
     if (viewFactory == null) {
       var div = new dom.DivElement();
       div.setInnerHtml(html, treeSanitizer: treeSanitizer);
       viewFactory = compiler(div.nodes, directives);
-      _viewFactoryCache.put(html, viewFactory);
+      viewFactoryCache.put(html, viewFactory);
     }
     return viewFactory;
   }

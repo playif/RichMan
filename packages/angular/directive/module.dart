@@ -1,24 +1,24 @@
- /**
+/**
+ * All of the core directives available in Angular. This library is included as part of [angular
+ * .dart](#angular/angular).
  *
- * Directives for [angular.dart](#angular/angular), a web framework for Dart. A directive attaches
- * a specified behavior to a DOM element.
- *
- * This library is included as part of [angular.dart](#angular/angular). It provides all of
- * the core Directives available in Angular. You can extend Angular by writing your own directives
- * and providing them as part of a custom library.
+ * A directive attaches a specified behavior to a DOM element. You can extend Angular by writing
+ * your own directives and providing them as part of a custom library.
  *
  * Directives consist of a class specifying the behavior, and a directive annotation (such as a
- * [Decorator] or a [Component]) that describes when the behavior should be applied.
+ * [Decorator](#angular-core-annotation.Decorator) or a
+ * [Component](#angular-core-annotation.Component)) that describes when the behavior should be
+ * applied.
  *
  * For example:
  *
  *     <span ng-show="ctrl.isVisible">this text is conditionally visible</span>
- *
  */
 library angular.directive;
 
 import 'package:di/di.dart';
 import 'dart:html' as dom;
+import 'dart:async' as async;
 import 'package:intl/intl.dart';
 import 'package:angular/core/annotation.dart';
 import 'package:angular/core/module_internal.dart';
@@ -51,9 +51,16 @@ part 'ng_non_bindable.dart';
 part 'ng_model_select.dart';
 part 'ng_form.dart';
 part 'ng_model_validators.dart';
+part 'ng_model_options.dart';
 
-class DecoratorFormatter extends Module {
-  DecoratorFormatter() {
+/**
+ * This module registers all the Angular directives.
+ *
+ * When instantiating an Angular application through applicationFactory,
+ * DirectiveModule is automatically included.
+ */
+class DirectiveModule extends Module {
+  DirectiveModule() {
     bind(AHref, toValue: null);
     bind(NgBaseCss);  // The root injector should have an empty NgBaseCss
     bind(NgBind, toValue: null);
@@ -81,6 +88,7 @@ class DecoratorFormatter extends Module {
     bind(ContentEditable, toValue: null);
     bind(NgBindTypeForDateLike, toValue: null);
     bind(NgModel, toValue: null);
+    bind(NgModelOptions, toValue: new NgModelOptions());
     bind(NgValue, toValue: null);
     bind(NgTrueValue, toValue: new NgTrueValue());
     bind(NgFalseValue, toValue: new NgFalseValue());

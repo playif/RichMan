@@ -3,6 +3,7 @@ library angular.core.dom_internal;
 import 'dart:async' as async;
 import 'dart:convert' show JSON;
 import 'dart:html' as dom;
+import 'dart:js' as js;
 
 import 'package:di/di.dart';
 import 'package:perf_api/perf_api.dart';
@@ -32,6 +33,7 @@ part 'event_handler.dart';
 part 'http.dart';
 part 'mustache.dart';
 part 'node_cursor.dart';
+part 'web_platform.dart';
 part 'selector.dart';
 part 'shadow_dom_component_factory.dart';
 part 'shadowless_shadow_root.dart';
@@ -42,6 +44,7 @@ part 'transcluding_component_factory.dart';
 part 'tree_sanitizer.dart';
 part 'walking_compiler.dart';
 part 'ng_element.dart';
+part 'static_keys.dart';
 
 class CoreDomModule extends Module {
   CoreDomModule() {
@@ -62,6 +65,8 @@ class CoreDomModule extends Module {
     bind(TranscludingComponentFactory);
     bind(Content);
     bind(ContentPort, toValue: null);
+    bind(ComponentCssRewriter);
+    bind(WebPlatform);
     
     bind(Http);
     bind(UrlRewriter);

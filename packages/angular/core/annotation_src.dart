@@ -236,7 +236,7 @@ bool _applyAuthorStylesDeprecationWarningPrinted = false;
 bool _resetStyleInheritanceDeprecationWarningPrinted = false;
 
 /**
- * Meta-data marker placed on a class which should act as a controller for the
+ * Annotation placed on a class which should act as a controller for the
  * component. Angular components are a light-weight version of web-components.
  * Angular components use shadow-DOM for rendering their templates.
  *
@@ -249,7 +249,8 @@ bool _resetStyleInheritanceDeprecationWarningPrinted = false;
  *
  * * `attach()` - Called on first [Scope.apply()].
  * * `detach()` - Called on when owning scope is destroyed.
- * * `onShadowRoot(ShadowRoot shadowRoot)` - Called when [ShadowRoot] is loaded.
+ * * `onShadowRoot(ShadowRoot shadowRoot)` - Called when
+ * [ShadowRoot](https://api.dartlang.org/apidocs/channels/stable/dartdoc-viewer/dart-dom-html.ShadowRoot) is loaded.
  */
 class Component extends Directive {
   /**
@@ -315,6 +316,11 @@ class Component extends Directive {
    */
   final bool useShadowDom;
 
+  /**
+   * Defaults to true, but if set to false any NgBaseCss stylesheets will be ignored.
+   */
+  final bool useNgBaseCss;
+
   const Component({
     this.template,
     this.templateUrl,
@@ -328,7 +334,8 @@ class Component extends Directive {
     visibility,
     exportExpressions,
     exportExpressionAttrs,
-    this.useShadowDom})
+    this.useShadowDom,
+    this.useNgBaseCss: true})
       : _cssUrls = cssUrl,
         _applyAuthorStyles = applyAuthorStyles,
         _resetStyleInheritance = resetStyleInheritance,
@@ -358,11 +365,12 @@ class Component extends Directive {
           visibility: visibility,
           exportExpressions: exportExpressions,
           exportExpressionAttrs: exportExpressionAttrs,
-          useShadowDom: useShadowDom);
+          useShadowDom: useShadowDom,
+          useNgBaseCss: useNgBaseCss);
 }
 
 /**
- * Meta-data marker placed on a class which should act as a directive.
+ * Annotation placed on a class which should act as a directive.
  *
  * Angular directives are instantiated using dependency injection, and can
  * ask for any injectable object in their constructor. Directives
@@ -402,7 +410,7 @@ class Decorator extends Directive {
 }
 
 /**
- * Meta-data marker placed on a class which should act as a controller for your
+ * Annotation placed on a class which should act as a controller for your
  * application.
  *
  * Controllers are essentially [Decorator]s with few key differences:
@@ -547,10 +555,16 @@ abstract class DetachAware {
 }
 
 /**
- * Use @[Formatter] annotation to register a new formatter. A formatter is a class
- * with a [call] method (a callable function).
+ * Use the @[Formatter] class annotation to identify a class as a formatter.
  *
- * Usage:
+ * A formatter is a pure function that performs a transformation on input data from an expression.
+ * For more on formatters in Angular, see the documentation for the
+ * [angular:formatter](#angular-formatter) library.
+ *
+ * A formatter class must have a call method with at least one parameter, which specifies the value to format. Any
+ * additional parameters are treated as arguments of the formatter.
+ *
+ * **Usage**
  *
  *     // Declaration
  *     @Formatter(name:'myFormatter')
