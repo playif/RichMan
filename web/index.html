@@ -6,34 +6,60 @@
     <title>Rich Man</title>
 </head>
 <body ng-app rich-man>
-
+<div class="header">
 你現在有{{ctrl.money.round()}}元！
-<button ng-click="ctrl.work()">撿破爛</button>
-<hr/>
+<button ng-click="ctrl.work()">撿破爛(+{{ctrl.workIncome+ctrl.totalCount}})</button>
+</div>
+<div class="space"></div>
 
 
 <!--<button nf-if="ctrl.canBuyDog" ng-click="ctrl.work()">撿破爛</button>-->
 
 <div ng-repeat="attr in ctrl.attributes">
-    <div ng-if="attr.show() || attr.unlock()" class="attribute">
-        <h4>{{attr.name}}
-            <a href="#" ng-if="attr.canBuy()" ng-click="attr.buy()">[購買]</a>
-        </h4>
+    <div ng-if="attr.show()" class="attribute">
+        <div class="info">
+            <div>{{attr.name}}
+                <a href="#" ng-if="attr.canBuy()" ng-click="attr.buy()">[購買]</a>
 
-        <div>費用：{{attr.cost().round()}}</div>
-        <div ng-if="attr.has()">數量：{{attr.count}}</div>
-        <div ng-if="attr.has()">等待：{{(attr.cd).round()}} / {{(attr.delay()).round()}}
-            ({{(100*attr.cd/attr.delay()).round()}}%)
+                <div ng-if="attr.has()" class="bar" ng-style="{width:attr.ratio}"></div>
+            </div>
+
+            <div>費用：{{attr.cost().round()}}</div>
+            <div ng-if="attr.has()">數量：{{attr.count}}</div>
+
+
+            <div ng-if="attr.has()">等待：{{(attr.cd).round()}} / {{(attr.delay()).round()}}
+                ({{(100*attr.cd/attr.delay()).toStringAsFixed(2)}}%)
+            </div>
+            <div ng-if="attr.has()">單獨收入：{{attr.singleIncome().toStringAsFixed(2)}}</div>
+            <div ng-if="attr.has()">單獨每秒：{{(attr.singleIncome()/attr.delay()).toStringAsFixed(2)}}/s</div>
+            <div ng-if="attr.has()">每回收入：{{attr.totalIncome().toStringAsFixed(2)}}</div>
+            <div ng-if="attr.has()">每秒收入：{{(attr.totalIncome()/attr.delay()).toStringAsFixed(2)}}/s</div>
+            <div ng-if="attr.has()">累積收入：{{attr.totalEarn.toStringAsFixed(2)}}</div>
+
+            <ul>
+                <li ng-repeat="desc in attr.desc">{{desc}}</li>
+
+            </ul>
+
+            <span ng-repeat="up in attr.upgrades"><span ng-if="up.level != 0">[{{up.name}}({{up.level}})] </span></span>
         </div>
-        <div ng-if="attr.has()">單獨收入：{{attr.singleIncome()}}</div>
-        <div ng-if="attr.has()">每回收入：{{attr.totalIncome()}}</div>
-        <div ng-if="attr.has()">每秒收入：{{(attr.totalIncome()/attr.delay()).toStringAsFixed(2)}}/s</div>
-        <div ng-if="attr.has()">累積收入：{{attr.totalEarn.round()}}</div>
-        <div>說明：
-            <div ng-repeat="desc in attr.desc">{{desc}}</div>
+        <div ng-if="attr.has()">
+            <div ng-repeat="up in attr.upgrades">
+                <div ng-if="up.show()" class="upgrade">
+                    升級：{{up.name}}({{up.level+1}})
+                    <a href="#" ng-if="up.canBuy()" ng-click="up.buy()">[購買]</a>
+
+                    <div>費用：{{up.cost().round()}}</div>
+                    <ul>
+                        <li ng-repeat="desc in up.desc">{{desc}}</li>
+                    </ul>
+                </div>
+            </div>
         </div>
-        <div ng-if="attr.has()" class="bar" ng-style="{width:attr.ratio}"></div>
     </div>
+
+
 </div>
 
 

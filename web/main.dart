@@ -18,6 +18,7 @@ typedef void When();
 class Attribute {
   String name;
   List<String> desc;
+  List<Upgrade> upgrades = [];
   int count = 0;
   int cd = 0;
   Func cost;
@@ -32,7 +33,7 @@ class Attribute {
   When everyBuy;
 
   num singleIncome() {
-    return ( income()).floor();
+    return income();
   }
 
   num totalIncome() {
@@ -49,6 +50,17 @@ class Attribute {
   bool has() {
     return count >= 1;
   }
+}
+
+class Upgrade {
+  String name;
+  List<String> desc;
+  int level = 0;
+  int maxLevel = 3;
+  Func cost;
+  If canBuy;
+  If show;
+  When buy;
 
 
 }
@@ -76,18 +88,22 @@ class RichMan {
     Attribute girl = new Attribute();
     Attribute smallVandor = new Attribute();
     Attribute smallBiss = new Attribute();
+    Attribute midBiss = new Attribute();
+    Attribute LargeBiss = new Attribute();
 
-    setupAttr(dog, 10, 1.1, 10)
+    var claw = setupUpgrade(dog, "利爪", ["野狗收入增加10"], 100000, 2);
+    var nose = setupUpgrade(dog, "嗅覺", ["野狗收入*2"], 1000000, 2);
+    setupAttr(dog, 100, 1.1, 10)
       ..name = "野狗"
-      ..desc = ["找點錢回來。"]
+      ..desc = ["他會用敏銳的鼻子幫你找點錢回來"]
       ..income = () {
-      return 1 + 0.5 * trainer.count;
+      return (1 + claw.level * 10 + 0.5 * trainer.count) * pow(2, nose.level);
     };
 
 
-    setupAttr(human, 100, 1.15, 11)
+    setupAttr(human, 1000, 1.15, 11)
       ..name = "流浪漢"
-      ..desc = ["找些錢回來。"]
+      ..desc = ["顧些流浪漢幫你找些錢回來", "你的女性員工會增加流浪漢的士氣"]
       ..income = () {
       return 10;
     }
@@ -97,34 +113,47 @@ class RichMan {
     };
 
 
-    setupAttr(trainer, 500, 1.2, 12)
+    setupAttr(trainer, 5000, 1.2, 12)
       ..name = "訓狗師"
-      ..desc = ["增加野狗的收入。"]
+      ..desc = ["賺點小錢", "增加野狗的收入"]
       ..income = () {
       return 100;
     };
 
-    setupAttr(girl, 1500, 1.25, 20)
+    setupAttr(girl, 15000, 1.25, 20)
       ..name = "女孩"
-      ..desc = ["減少流浪漢的等待時間。"]
+      ..desc = ["賣點口香糖賺錢吧"]
       ..income = () {
       return 500;
     };
 
-    setupAttr(smallVandor, 5500, 1.3, 40)
+    setupAttr(smallVandor, 55000, 1.3, 40)
       ..name = "小攤販"
-      ..desc = ["獲得不少收入。"]
+      ..desc = ["獲得不少收入", "越多員工收入越多"]
       ..income = () {
-      return 8000 + pow(girl.count, 1.5);
+      return 8000 + pow(girl.count, 1.5) + pow(human.count, 1.5);
     };
 
-    setupAttr(smallBiss, 85000, 1.4, 80)
+    setupAttr(smallBiss, 850000, 1.4, 80)
       ..name = "小店鋪"
-      ..desc = ["獲得更多收入。"]
+      ..desc = ["獲得更多收入", "每個小攤販都會增加店鋪收入"]
       ..income = () {
-      return 120000 + smallBiss.count * pow(smallVandor.count, 1.5);
+      return 120000 + pow(smallVandor.count * 100, 1.5);
     };
 
+    setupAttr(midBiss, 720000, 1.5, 160)
+      ..name = "中型店鋪"
+      ..desc = ["比小店舖獲得更多收入", "每個小攤販和小店舖都會增加收入"]
+      ..income = () {
+      return 920000 + pow(smallBiss.count * 300, 1.5) + pow(smallVandor.count * 200, 1.5);
+    };
+
+    setupAttr(LargeBiss, 5220000, 1.6, 320)
+      ..name = "大型店鋪"
+      ..desc = ["比中型店舖獲得更多收入", "所有店舖都會增加收入"]
+      ..income = () {
+      return 8820000 + pow(midBiss.count * 2500, 1.5) + pow(smallBiss.count * 1500, 1.5) + pow(smallVandor.count * 1000, 1.5);
+    };
 
     Timer timer = new Timer.periodic(dt, _update);
 
@@ -151,11 +180,7 @@ class RichMan {
     };
 
     attr.canBuy = () {
-      //return canBuyForever(attr);
-      if (money >= attr.cost()) {
-        return true;
-      }
-      return false;
+      return money >= attr.cost();
     };
 
     attr.show = () {
@@ -181,6 +206,7 @@ class RichMan {
       if (money >= attr.cost()) {
         money -= attr.cost();
         attr.count += 1;
+        totalCount += 1;
         attr.everyBuy();
         if (!unlocks.contains(attr.name)) {
           unlocks.add(attr.name);
@@ -192,6 +218,47 @@ class RichMan {
 
     attributes.add(attr);
     return attr;
+  }
+
+  Upgrade setupUpgrade(Attribute attr, String name, List<String> desc, int costBase, int costExp, { canBuy, show, buy, maxLevel}) {
+
+    Upgrade up = new Upgrade();
+    attr.upgrades.add(up);
+
+    up.name = name;
+    up.desc = desc;
+
+    if (maxLevel != null) {
+      up.maxLevel = maxLevel;
+    }
+
+    up.cost = () {
+      return costBase * pow(up.level + 1, costExp);
+    };
+
+    if (canBuy == null) {
+      up.canBuy = () {
+        return money >= up.cost() && up.maxLevel > up.level;
+      };
+    }
+
+    if (show == null) {
+      up.show = () {
+        return totalEarn >= up.cost() && up.maxLevel > up.level;
+      };
+    }
+
+    if (buy == null) {
+      up.buy = () {
+        if (up.canBuy()) {
+          money -= up.cost();
+          up.level += 1;
+          totalUpgrade += 1;
+        }
+      };
+    }
+
+    return up;
   }
 
   List<Attribute> attributes = [];
@@ -206,6 +273,7 @@ class RichMan {
         money += income;
         attr.totalEarn += income;
         totalEarn += income;
+        totalAction += 1;
         attr.action();
       }
     }
@@ -214,14 +282,17 @@ class RichMan {
 
 //  int income = 0;
 
-  int workIncome = 1;
+  int workIncome = 10;
   int money = 0;
   int totalEarn = 0;
+  int totalCount = 0;
+  int totalAction = 0;
+  int totalUpgrade = 0;
 
 //  bool canBuyDog = false;
 
   void work() {
-    money += workIncome;
+    money += workIncome + totalCount;
     totalEarn += workIncome;
   }
 

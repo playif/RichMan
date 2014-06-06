@@ -2,12 +2,37 @@
     border: 1px solid black;
     margin: 5px;
     padding: 5px;
+    overflow: auto;
+}
+
+.attribute .info {
+    border: 1px solid black;
     float: left;
-    max-width: 250px;
-    min-width: 200px;
+    padding: 5px;
+    margin: 5px;
+}
+
+.upgrade {
+    border: 1px solid black;
+    float: left;
+    padding: 5px;
+    margin: 5px;
+    overflow: auto;
 }
 
 .bar {
     height: 10px;
     background-color: red;
+}
+
+.header {
+    position: fixed;
+    background-color: aquamarine;
+    left: 0px;
+    right: 0px;
+    top:0px;
+}
+
+.space{
+    height: 40px;
 }
