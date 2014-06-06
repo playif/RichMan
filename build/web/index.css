@@ -3,7 +3,7 @@
     margin: 5px;
     padding: 5px;
     overflow: auto;
-    min-width: 300px;
+
 }
 
 .attribute .info {
@@ -11,6 +11,7 @@
     float: left;
     padding: 5px;
     margin: 5px;
+    min-width: 300px;
 }
 
 .upgrade {

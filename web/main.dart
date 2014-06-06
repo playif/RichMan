@@ -282,7 +282,7 @@ class RichMan {
 
 //  int income = 0;
 
-  int workIncome = 10;
+  int workIncome = 1000000;
   int money = 0;
   int totalEarn = 0;
   int totalCount = 0;

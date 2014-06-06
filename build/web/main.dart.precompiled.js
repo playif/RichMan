@@ -18522,7 +18522,7 @@ J.DF(q,"\u5927\u578b\u5e97\u92ea")
 q.sSE(["\u6bd4\u4e2d\u578b\u5e97\u8216\u7372\u5f97\u66f4\u591a\u6536\u5165","\u6240\u6709\u5e97\u8216\u90fd\u6703\u589e\u52a0\u6536\u5165"])
 q.spY(new F.Iok(v,u,t))
 P.SZ2(C.Hks,this.gxj())},
-static:{f0:function(){var z=new F.aI(P.Ls(null,null,null,null),[],10,0,0,0,0,0)
+static:{f0:function(){var z=new F.aI(P.Ls(null,null,null,null),[],1000000,0,0,0,0,0)
 z.Pf()
 return z}}},
 Li:{
