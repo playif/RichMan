@@ -8,7 +8,9 @@
 <body ng-app rich-man>
 <div class="header">
 你現在有{{ctrl.money.round()}}元！
-<button ng-click="ctrl.work()">撿破爛(+{{ctrl.workIncome+ctrl.totalCount}})</button>
+    <span ng-repeat="work in ctrl.works">
+        <button ng-if="work.show()" ng-click="work.work()">{{work.name}}(+{{work.income()}})</button>
+    </span>
 </div>
 <div class="space"></div>
 
