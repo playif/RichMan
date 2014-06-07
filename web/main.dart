@@ -118,7 +118,7 @@ class RichMan {
   RichMan() {
     Work pick = setupWork("撿破爛", [], 0,
     income:() {
-      return 10000000000000 + totalCount * 2;
+      return 10 + totalCount * 2;
     });
 
     Work biss = setupWork("做生意", [], 8000,
