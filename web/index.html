@@ -20,13 +20,21 @@
 <div ng-repeat="attr in ctrl.attributes">
     <div ng-if="attr.show() || attr.unlock()" class="attribute">
         <div class="info">
-            <div>{{attr.name}}：
-                <a href="javascript:void(0);" ng-if="attr.unlock()" ng-click="attr.hurry()">[催促]</a>
+            <div>{{attr.name}}
+
                 <a href="javascript:void(0);" ng-if="attr.canBuy()" ng-click="attr.buy()">[購買]</a>
 
                 <div ng-if="attr.has()" class="bar" ng-style="{width:attr.ratio}"></div>
             </div>
-
+            <div>行動：
+                <a href="javascript:void(0);" ng-if="attr.unlock()" ng-click="attr.hurry()" title="暫時加速">| 催促
+                    ({{attr.hurryCount}})</a>
+                <a href="javascript:void(0);" ng-if="attr.unlock()" ng-click="attr.cheer()" title="暫時增加收入">| 鼓勵
+                    ({{attr.cheerCount}})</a>
+                <a href="javascript:void(0);" ng-if="attr.unlock()" ng-click="attr.argue()" title="暫時減少等待">| 鞭策
+                    ({{attr.argueCount}})</a>
+                <!--<a href="javascript:void(0);" ng-if="attr.unlock()" ng-click="attr.crime()" title="暫時減少等待">| 鞭策(65)</a>-->
+            </div>
             <div>費用：{{attr.cost().round()}}</div>
             <div ng-if="attr.has()">數量：{{attr.count}}</div>
 

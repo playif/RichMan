@@ -23,7 +23,22 @@ class Attribute {
   int cd = 0;
   int totalEarn = 0;
   int totalAction = 0;
+
+  int hurryEffect = 1;
+  int hurryCount = 0;
   int totalHurry = 0;
+  int maxHurry = 100;
+
+  int cheerEffect = 2;
+  int cheerCount = 0;
+  int totalCheer = 0;
+  int maxCheer = 100;
+
+  int argueEffect = 2;
+  int argueCount = 0;
+  int totalArgue = 0;
+  int maxArgue = 100;
+
   Func cost;
   Func income;
   Func delay;
@@ -34,7 +49,10 @@ class Attribute {
   When buy;
   When firstBuy;
   When everyBuy;
+
   When hurry;
+  When cheer;
+  When argue;
 
   num singleIncome() {
     return income();
@@ -100,7 +118,7 @@ class RichMan {
   RichMan() {
     Work pick = setupWork("撿破爛", [], 0,
     income:() {
-      return 10 + totalCount * 2;
+      return 10000000000000 + totalCount * 2;
     });
 
     Work biss = setupWork("做生意", [], 8000,
@@ -274,10 +292,34 @@ class RichMan {
     };
 
     attr.hurry = () {
-      attr.cd += 1;
-      attr.totalHurry += 1;
-      totalHurry += 1;
+      if (attr.hurryCount >= attr.maxHurry) {
+        return;
+      }
+      num val = min(1, attr.maxHurry - attr.hurryCount);
+      attr.hurryCount += val;
+      attr.totalHurry += val;
+      totalHurry += val;
     };
+
+    attr.cheer = () {
+      if (attr.cheerCount >= attr.maxCheer) {
+        return;
+      }
+      attr.cheerCount += 1;
+      attr.totalCheer += 1;
+      totalCheer += 1;
+    };
+
+    attr.argue = () {
+      if (attr.argueCount >= attr.maxArgue) {
+        return;
+      }
+      num val = min(1, attr.maxArgue - attr.argueCount);
+      attr.argueCount += val;
+      attr.totalArgue += val;
+      totalArgue += val;
+    };
+
 
     attr.buy = () {
       if (money >= attr.cost()) {
@@ -386,10 +428,33 @@ class RichMan {
   _update(Timer timer) {
     for (var attr in attributes) {
       if (!attr.has())continue;
+      num delay = 1;
+      if (attr.hurryCount >= 1) {
+        delay += attr.hurryEffect;
+      }
       attr.cd += delay;
-      if (attr.cd >= attr.delay()) {
+
+      num attDelay = attr.delay();
+      if (attr.argueCount >= 1) {
+
+        attDelay /= attr.argueEffect;
+      }
+
+      if (attr.cd >= attDelay) {
         attr.cd = 0;
+        if (attr.argueCount >= 1) {
+          attr.argueCount--;
+        }
+        if (attr.hurryCount >= 1) {
+          attr.hurryCount--;
+        }
+
         var income = (attr.income() * attr.count);
+        if (attr.cheerCount >= 1) {
+          attr.cheerCount--;
+          income *= attr.cheerEffect;
+        }
+
         money += income;
         attr.totalEarn += income;
         attr.totalAction += attr.count;
@@ -410,6 +475,8 @@ class RichMan {
   int totalUpgrade = 0;
   int totalWork = 0;
   int totalHurry = 0;
+  int totalCheer = 0;
+  int totalArgue = 0;
 
 //  bool canBuyDog = false;
 

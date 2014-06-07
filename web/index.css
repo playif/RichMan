@@ -7,6 +7,14 @@
     user-select: none;
 }
 
+a {
+    text-decoration: none;
+}
+
+a:hover {
+    color: fuchsia;
+}
+
 .attribute {
     border: 1px solid black;
     margin: 5px;
