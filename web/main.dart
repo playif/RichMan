@@ -153,7 +153,7 @@ class RichMan {
 
     Attribute human = new Attribute();
     var power = setupUpgrade(human, "體能鍛鍊", ["收入增加30"], 200000, 2);
-    var group = setupUpgrade(human, "乞丐幫", ["費用/2"], 2000000, 2);
+    var group = setupUpgrade(human, "乞丐幫", ["購買流浪漢費用減半"], 2000000, 2);
     var home = setupUpgrade(human, "家庭計畫", ["每個女姓員工減少的等待效果加30%"], 6000000, 5, maxLevel:5);
 
 
@@ -185,7 +185,7 @@ class RichMan {
 
     setupAttr(human, 1000, 1.12, 11)
       ..name = "流浪漢"
-      ..desc = ["顧些流浪漢幫你找些錢回來", "你的女性員工會減少等待"]
+      ..desc = ["顧些流浪漢幫你找些錢回來", "女性員工會減少流浪漢等待"]
       ..income = () {
       return (10 + humanTrain.level * trainer.count + power.level * 30) * pow(1.1, humanTrain.level);
     }
