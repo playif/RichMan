@@ -119,8 +119,12 @@ main() {
 class RichMan {
 
   List tabs = [
-      { 'title':'Dynamic Title 1', 'content':'Dynamic content 1', 'active':false, 'disabled': false },
-      { 'title':'Dynamic Title 2', 'content':'Dynamic content 2', 'active':false, 'disabled': true }
+      {
+          'title':'Dynamic Title 1', 'content':'Dynamic content 1', 'active':false, 'disabled': false
+      },
+      {
+          'title':'Dynamic Title 2', 'content':'Dynamic content 2', 'active':false, 'disabled': true
+      }
   ];
 
   void alertMe() {
