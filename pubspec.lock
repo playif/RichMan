@@ -9,6 +9,10 @@ packages:
     description: angular
     source: hosted
     version: "0.12.0"
+  angular_ui:
+    description: angular_ui
+    source: hosted
+    version: "0.5.1"
   args:
     description: args
     source: hosted
@@ -41,6 +45,10 @@ packages:
     description: intl
     source: hosted
     version: "0.9.9"
+  js:
+    description: js
+    source: hosted
+    version: "0.2.2"
   logging:
     description: logging
     source: hosted

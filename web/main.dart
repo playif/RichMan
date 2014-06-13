@@ -5,6 +5,9 @@ import 'package:angular/application_factory.dart';
 import 'dart:async';
 import 'dart:math';
 
+import 'dart:html' as dom;
+import 'package:angular_ui/angular_ui.dart';
+
 const Duration dt = const Duration(milliseconds:100);
 const int delay = 1;
 
@@ -101,6 +104,7 @@ class Work {
 
 main() {
   applicationFactory()
+  .addModule(new AngularUIModule())
   .addModule(new AnimationModule())
   .addModule(new Module()
     ..bind(RichMan))
@@ -113,6 +117,16 @@ main() {
     selector: '[rich-man]',
     publishAs: 'ctrl')
 class RichMan {
+
+  List tabs = [
+      { 'title':'Dynamic Title 1', 'content':'Dynamic content 1', 'active':false, 'disabled': false },
+      { 'title':'Dynamic Title 2', 'content':'Dynamic content 2', 'active':false, 'disabled': true }
+  ];
+
+  void alertMe() {
+    dom.window.alert('You\'ve selected the alert tab!');
+  }
+
   Set<String> unlocks = new Set();
 
   RichMan() {

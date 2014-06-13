@@ -2,5 +2,6 @@ name: RichMan
 dependencies:
   browser: any
   angular: any
+  angular_ui: any
 transformers:
   - angular
